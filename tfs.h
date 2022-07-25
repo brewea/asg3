@@ -45,8 +45,10 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 
 /* defined sizes and limits */
@@ -147,3 +149,9 @@ unsigned int tfs_size( unsigned int file_descriptor );
 unsigned int tfs_new_directory_entry();
 unsigned int tfs_map_name_to_fd( char *name );
 unsigned int tfs_new_block();
+
+/*other functions */
+bool file_is_readable(unsigned int file_descriptor);
+bool file_is_writable(unsigned int file_descriptor);
+void file_make_readable(unsigned int file_descriptor);
+void file_make_writable(unsigned int file_descriptor);

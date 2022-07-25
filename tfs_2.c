@@ -29,9 +29,19 @@
 
 unsigned int tfs_delete( unsigned int file_descriptor ){
 
-  /* your code here */
-
+  unsigned int i;
+	file_allocation_table = (unsigned char *)&storage[256];
+	for (i = 0; i < N_BYTES; i++){
+		storage[i] = 0;
+	}
+	directory[file_descriptor].status = 0;
+	directory[file_descriptor].first_block = 0;
+	directory[file_descriptor].byte_offset = 0;
+	directory[file_descriptor].size = 0;
+	return TRUE;
 }
+
+
 
 
 /* tfs_read()
@@ -70,9 +80,19 @@ unsigned int tfs_delete( unsigned int file_descriptor ){
 unsigned int tfs_read( unsigned int file_descriptor,
                        char *buffer,
                        unsigned int byte_count ){
-
-  /* your code here */
-
+						/*
+  directory[file_descriptor].first_block = LAST_BLOCK;
+	unsigned int b;
+	b = directory[file_descriptor].first_block;
+	int j = 0;
+	for (int i = 0; i < byte_count; i++){
+		if (j < BLOCK_SIZE - 1)	{
+			sprintf(buffer, "%c", storage[i]);
+			j++;
+		}
+	}
+	return byte_count;
+	*/
 }
 
 /* tfs_write()
@@ -81,6 +101,8 @@ unsigned int tfs_read( unsigned int file_descriptor,
  *   into a file starting at the byte offset in the directory;
  *   the byte offset in the directory entry is incremented by
  *   the number of bytes transferred
+ * 
+ *   
  *
  * depending on the starting byte offset and the specified
  *   number of bytes to transfer, the transfer may cross two
@@ -114,12 +136,79 @@ unsigned int tfs_read( unsigned int file_descriptor,
  *   transfer
  *
  * return value is the number of bytes transferred
+ * 
+ * 1. Byte offset
+ * 2. Increment the byte offset by the bytes written
+ * 		2a. Figure out if the total between Byte offset and new byte offset is 		
+ * 			more than number of bytes in the file block
+ * 		2b. Check if more file blocks are available
+ * 			2bT. If file block IS available file size will be based on number
+ * 				of bytes transfered beyond the original size of the file
+ * 			2bF - If file block is NOT available only read the amount of blocks
+ * 				available
+ * 	3. Return number of bytes transferred
+ * 
  */
 
-unsigned int tfs_write( unsigned int file_descriptor,
-                        char *buffer,
-                        unsigned int byte_count ){
+unsigned int tfs_write( unsigned int file_descriptor, char *buffer, unsigned int byte_count ){
 
-  /* your code here */
+	// bytesTransferred is only if total byte_count is smaller than total file_descriptor size
+	int bytesTransfered;
+	
+	// Creating a new block in file_descriptor
+	directory[file_descriptor].byte_offset = tfs_seek; // sets the byte offset in a directory entry
+	directory[file_descriptor].first_block = tfs_new_block; // Set address of first block
+	directory[file_descriptor].size = BLOCK_SIZE; // Set first block = 128
 
+	// Check if buffer is larger than file block create another block
+	if(directory[file_descriptor].size < byte_count){
+		// If it is, create another block if possible
+	}
+	else{
+		// If not possible, only write what is in the existing blocks
+	}
+
+	printf("byte_offset = %d\n", directory[file_descriptor].byte_offset);
+	printf("byte_count = %d\n", (int)byte_count);
+	int totalBytes = directory[file_descriptor].byte_offset + (int)byte_count;
+	unsigned int b;
+	b = directory[file_descriptor].first_block;
+	
+
+	int j = 0;
+	for (int i = 0; i < byte_count; i++){
+		if (j < BLOCK_SIZE - 1)	{
+			sprintf(storage, "%c", buffer[i]);
+			j++;
+		}
+
+		else{
+			file_allocation_table[b] = *storage;
+			file_allocation_table[b] = tfs_new_block();
+			b = file_allocation_table[b];
+			j = 0;
+		}
+		
+	}
+
+	//file_allocation_table[b] = LAST_BLOCK;
+
+	//directory[file_descriptor].size = byte_count;
+	// file_allocation_table[b] = LAST_BLOCK;
+
+	directory[file_descriptor].byte_offset = byte_count + 1;
+	return byte_count;
 }
+
+// bool file_is_readable(unsigned int file_descriptor){
+
+// }
+// bool file_is_writable(unsigned int file_descriptor){
+
+// }
+// void file_make_readable(unsigned int file_descriptor){
+
+// }
+// void file_make_writable(unsigned int file_descriptor){
+
+// }
