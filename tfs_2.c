@@ -93,6 +93,7 @@ unsigned int tfs_read( unsigned int file_descriptor,
 	}
 	return byte_count;
 	*/
+return 0;
 }
 
 /* tfs_write()
@@ -151,53 +152,51 @@ unsigned int tfs_read( unsigned int file_descriptor,
  */
 
 unsigned int tfs_write( unsigned int file_descriptor, char *buffer, unsigned int byte_count ){
-
-	// bytesTransferred is only if total byte_count is smaller than total file_descriptor size
-	int bytesTransfered;
 	
-	// Creating a new block in file_descriptor
-	directory[file_descriptor].byte_offset = tfs_seek; // sets the byte offset in a directory entry
-	directory[file_descriptor].first_block = tfs_new_block; // Set address of first block
-	directory[file_descriptor].size = BLOCK_SIZE; // Set first block = 128
-
+	char temp[BLOCK_SIZE];
+	unsigned int b = FIRST_VALID_BLOCK;
+	unsigned int bytes_written = 0;
+	
+	directory[file_descriptor].first_block = file_allocation_table[b];
+	directory[file_descriptor].size = byte_count + directory[file_descriptor].size; // Set size = current byte count + byte_count passed
+	
+	
 	// Check if buffer is larger than file block create another block
-	if(directory[file_descriptor].size < byte_count){
+	unsigned int i = 0;
+	if(byte_count > BLOCK_SIZE){
+		while(bytes_written < byte_count){
+			if(bytes_written < BLOCK_SIZE){
+				temp[i] = buffer[i];
+				bytes_written++;
+			}
+			
+			else{
+				file_allocation_table[b++] = tfs_new_block;
+				bytes_written++;
+			}
+		} 
+
+	}
+	
+	memcpy(storage,buffer,N_BYTES);
+	if(BLOCK_SIZE >= byte_count){
 		// If it is, create another block if possible
+		printf("\n***Block has enough memory***\n");
+		memcpy(storage,buffer,N_BYTES);
+		
+		
 	}
 	else{
 		// If not possible, only write what is in the existing blocks
-	}
-
-	printf("byte_offset = %d\n", directory[file_descriptor].byte_offset);
-	printf("byte_count = %d\n", (int)byte_count);
-	int totalBytes = directory[file_descriptor].byte_offset + (int)byte_count;
-	unsigned int b;
-	b = directory[file_descriptor].first_block;
-	
-
-	int j = 0;
-	for (int i = 0; i < byte_count; i++){
-		if (j < BLOCK_SIZE - 1)	{
-			sprintf(storage, "%c", buffer[i]);
-			j++;
-		}
-
-		else{
-			file_allocation_table[b] = *storage;
-			file_allocation_table[b] = tfs_new_block();
-			b = file_allocation_table[b];
-			j = 0;
-		}
+		printf("\n***Block does not enough memory***\n");
+		
 		
 	}
-
-	//file_allocation_table[b] = LAST_BLOCK;
-
-	//directory[file_descriptor].size = byte_count;
-	// file_allocation_table[b] = LAST_BLOCK;
+	file_allocation_table[b] = LAST_BLOCK;
 
 	directory[file_descriptor].byte_offset = byte_count + 1;
 	return byte_count;
+	
 }
 
 // bool file_is_readable(unsigned int file_descriptor){

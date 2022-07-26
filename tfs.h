@@ -42,6 +42,7 @@
  * | status | first_ |  size  |  byte_ |      name         |
  * |        | block  |        | offset |                   |
  * +--------+--------+--------+--------+--------------...--+
+ * I think the FAT is inside the first block
  */
 
 #include <stdio.h>
@@ -94,11 +95,12 @@ struct file_block{
   char bytes[BLOCK_SIZE];
 };
 
+
 struct directory_entry{
-  unsigned char status;
-  unsigned char first_block;
-  unsigned short size;
-  unsigned short byte_offset;
+  unsigned char status;	// EITHER 0, 1, or 2
+  unsigned char first_block;	// POINTER TO File Allocation Table
+  unsigned int size;	// removed short	// Size of the entire entry
+  unsigned int byte_offset;	// removed short	// NOT SURE
   char name[FILENAME_LENGTH + 1];
 };
 

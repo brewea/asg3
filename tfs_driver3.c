@@ -1,3 +1,4 @@
+
 /* test driver */
 
 #include "tfs.h"
@@ -26,9 +27,11 @@ int main(){
   printf( "length of buffer1 is %d\n", length1 );
   printf( "length of buffer2 is %d\n", length2 );
 
+	//initializes the directory as empty and the file allocation table
+    //to have all blocks free
   tfs_init();
 
-  //tfs_list_directory();
+  tfs_list_directory();
 
   fd[0] = tfs_create( "file.txt" );
   if( fd[0] == 0 ) printf( "first create failed\n" );
@@ -36,7 +39,7 @@ int main(){
   fd[1] = tfs_create( "my_file" );
   if( fd[1] == 0 ) printf( "second create failed\n" );
 
-  //tfs_list_directory();
+  tfs_list_directory();
 
   count1 = tfs_write( fd[0], buffer1, length1 );
   printf( "%d bytes written to first file\n", count1 );
@@ -49,24 +52,24 @@ int main(){
 
   tfs_close( fd[1] );
 
-  //tfs_list_directory();
+  tfs_list_directory();
   tfs_list_blocks();
 
   tfs_seek( fd[0], 600 );
   count3 = tfs_read( fd[0], buffer3, 640 );
-  //printf( "%d bytes read from first file\n", count3 );
+  printf( "%d bytes read from first file\n", count3 );
   buffer3[count3] = '\0';
-  //printf( "[%s]\n", buffer3 );
+  printf( "[%s]\n", buffer3 );
 
   tfs_seek( fd[0], 250 );
   count3 = tfs_read( fd[0], buffer3, 20 );
-  //printf( "%d bytes read from first file\n", count3 );
+  printf( "%d bytes read from first file\n", count3 );
   buffer3[count3] = '\0';
-  //printf( "[%s]\n", buffer3 );
+  printf( "[%s]\n", buffer3 );
 
   fd[2] = tfs_create( "file.txt" );
-  //printf( "fd for creating a file with identical name" );
-  //printf( " as existing file - %d\n", fd[2] );
+  printf( "fd for creating a file with identical name" );
+  printf( " as existing file - %d\n", fd[2] );
   fd[2] = tfs_create( "file3" );
   fd[3] = tfs_create( "file4" );
   fd[4] = tfs_create( "file5" );
@@ -81,14 +84,14 @@ int main(){
   fd[13] = tfs_create( "file14" );
   fd[14] = tfs_create( "file15" );
   fd[15] = tfs_create( "file16" );
-  //printf( "fd for creating a sixteenth file - %d\n", fd[15] );
+printf( "fd for creating a sixteenth file - %d\n", fd[15] );
 
-  //tfs_list_directory();
+tfs_list_directory();
 
   tfs_close( fd[0] );
   tfs_delete( fd[0] );
 
-  //tfs_list_directory();
+tfs_list_directory();
 
   tfs_close( fd[3] );
   tfs_close( fd[4] );
@@ -99,12 +102,12 @@ int main(){
   tfs_delete( fd[6] );
   tfs_delete( fd[7] );
 
-  //tfs_list_directory();
+tfs_list_directory();
 
   fd[16] = tfs_create( "added_1" );
   fd[17] = tfs_create( "added_2" );
 
-  //tfs_list_directory();
+tfs_list_directory();
   tfs_list_blocks();
 
   return 0;
