@@ -29,15 +29,15 @@
 
 unsigned int tfs_delete( unsigned int file_descriptor ){
 
-  unsigned int i;
-	file_allocation_table = (unsigned char *)&storage[256];
-	for (i = 0; i < N_BYTES; i++){
-		storage[i] = 0;
-	}
-	directory[file_descriptor].status = 0;
-	directory[file_descriptor].first_block = 0;
-	directory[file_descriptor].byte_offset = 0;
-	directory[file_descriptor].size = 0;
+//   unsigned int i;
+// 	file_allocation_table = (unsigned char *)&storage[256];
+// 	for (i = 0; i < N_BYTES; i++){
+// 		storage[i] = 0;
+// 	}
+// 	directory[file_descriptor].status = 0;
+// 	directory[file_descriptor].first_block = 0;
+// 	directory[file_descriptor].byte_offset = 0;
+// 	directory[file_descriptor].size = 0;
 	return TRUE;
 }
 
@@ -80,7 +80,15 @@ unsigned int tfs_delete( unsigned int file_descriptor ){
 unsigned int tfs_read( unsigned int file_descriptor,
                        char *buffer,
                        unsigned int byte_count ){
-						/*
+						
+//   if(!tfs_check_fd_in_range(file_descriptor)) {
+// 	return(0);
+//   }
+
+//   if(!tfs_check_file_is_open(file_descriptor)) {
+// 	return(0);
+//   }
+  /*
   directory[file_descriptor].first_block = LAST_BLOCK;
 	unsigned int b;
 	b = directory[file_descriptor].first_block;
@@ -152,49 +160,38 @@ return 0;
  */
 
 unsigned int tfs_write( unsigned int file_descriptor, char *buffer, unsigned int byte_count ){
-	
-	char temp[BLOCK_SIZE];
-	unsigned int b = FIRST_VALID_BLOCK;
-	unsigned int bytes_written = 0;
-	
-	directory[file_descriptor].first_block = file_allocation_table[b];
-	directory[file_descriptor].size = byte_count + directory[file_descriptor].size; // Set size = current byte count + byte_count passed
-	
-	
-	// Check if buffer is larger than file block create another block
-	unsigned int i = 0;
-	if(byte_count > BLOCK_SIZE){
-		while(bytes_written < byte_count){
-			if(bytes_written < BLOCK_SIZE){
-				temp[i] = buffer[i];
-				bytes_written++;
-			}
-			
-			else{
-				file_allocation_table[b++] = tfs_new_block;
-				bytes_written++;
-			}
-		} 
+	if(!tfs_check_fd_in_range(file_descriptor)) {
+		return(0);
+	}
 
+	if(!tfs_check_file_is_open(file_descriptor)) {
+		return(0);
 	}
-	
-	memcpy(storage,buffer,N_BYTES);
-	if(BLOCK_SIZE >= byte_count){
-		// If it is, create another block if possible
-		printf("\n***Block has enough memory***\n");
-		memcpy(storage,buffer,N_BYTES);
-		
-		
-	}
-	else{
-		// If not possible, only write what is in the existing blocks
-		printf("\n***Block does not enough memory***\n");
-		
-		
-	}
-	file_allocation_table[b] = LAST_BLOCK;
 
-	directory[file_descriptor].byte_offset = byte_count + 1;
+	if(directory[file_descriptor].status == 0) {
+		return(0);
+	}
+	unsigned int numBlocks = 1 + (byte_count / BLOCK_SIZE);
+	int byte_offset = directory[file_descriptor].byte_offset;
+	directory[file_descriptor].byte_offset = byte_offset + *buffer;
+	unsigned int i;
+	for(i = 0; i <= numBlocks; i++){
+		unsigned int b = tfs_new_block();
+        
+		//makes sure that new block creation was successful 
+		if(!b){
+			return byte_count - BLOCK_SIZE;
+		}
+
+		directory[file_descriptor].first_block = b;
+
+		file_allocation_table[b] = b + 1;
+
+		if(i == numBlocks){
+  			file_allocation_table[b] = LAST_BLOCK;
+		}
+	}
+
 	return byte_count;
 	
 }
