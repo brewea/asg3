@@ -172,32 +172,32 @@ unsigned int tfs_write( unsigned int file_descriptor, char *buffer, unsigned int
 		return(0);
 	}
 	unsigned int numBlocks = ((int) byte_count / BLOCK_SIZE) + 1;
-	int startLocation = tfs_seek(file_descriptor,directory[file_descriptor].byte_offset);
-	printf("startLocation = %d\n\n\n", startLocation);
-	//int byte_offset = directory[file_descriptor].byte_offset;
-	//directory[file_descriptor].byte_offset = byte_offset + *buffer;
-	unsigned int i;
+	int ogByteCount = byte_count;
+	
+	unsigned int b = tfs_new_block();
+	directory[file_descriptor].first_block = *file_allocation_table;
 
-	for(i = startLocation; i <= numBlocks; i++){
-		unsigned int b = tfs_new_block();
+	for(int i = 0; i <= numBlocks; i++){
 		
-        
-		//makes sure that new block creation was successful 
-		if(!b){
-			return byte_count - BLOCK_SIZE;
-		}
+		// if(!b){
+		// 	return byte_count - BLOCK_SIZE;
+		// }
+		
+		
+		strncat(storage,buffer,directory[file_descriptor].byte_offset);
+		*blocks->bytes = *storage;
+		file_allocation_table[b] = *blocks->bytes;
+		file_allocation_table[b] = b + 1;
+		//b = tfs_new_block();
+		
+		
 		if(i == numBlocks){
-  			file_allocation_table[b] = LAST_BLOCK;
+			//file_allocation_table[b] = b + 1;
+  			*file_allocation_table = LAST_BLOCK;
 		}
-		else{
-			strncpy(blocks->bytes,buffer,startLocation % BLOCK_SIZE);
-			directory[file_descriptor].first_block = b;
-
-			file_allocation_table[b] = b + 1;
-		}
+		
 	}
-
-	return byte_count;
+	return ogByteCount;
 	
 }
 
