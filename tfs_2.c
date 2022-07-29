@@ -172,32 +172,25 @@ unsigned int tfs_write( unsigned int file_descriptor, char *buffer, unsigned int
 		return(0);
 	}
 	unsigned int numBlocks = ((int) byte_count / BLOCK_SIZE) + 1;
-	int ogByteCount = byte_count;
-	
+	int bytes_written = 0;
 	unsigned int b = tfs_new_block();
-	directory[file_descriptor].first_block = *file_allocation_table;
+	directory[file_descriptor].first_block = file_allocation_table[b];
 
 	for(int i = 0; i <= numBlocks; i++){
 		
-		// if(!b){
-		// 	return byte_count - BLOCK_SIZE;
-		// }
-		
-		
-		strncat(storage,buffer,directory[file_descriptor].byte_offset);
-		*blocks->bytes = *storage;
-		file_allocation_table[b] = *blocks->bytes;
-		file_allocation_table[b] = b + 1;
-		//b = tfs_new_block();
-		
-		
+		if(byte_count >= BLOCK_SIZE-1){
+			strncat(blocks->bytes,buffer,BLOCK_SIZE-1);
+			printf("\nGreater than");
+		}
+		file_allocation_table[b] = file_allocation_table[b] + 1;
+		b = tfs_new_block();
 		if(i == numBlocks){
 			//file_allocation_table[b] = b + 1;
-  			*file_allocation_table = LAST_BLOCK;
+  			file_allocation_table[b] = LAST_BLOCK;
 		}
 		
 	}
-	return ogByteCount;
+	return bytes_written;
 	
 }
 
