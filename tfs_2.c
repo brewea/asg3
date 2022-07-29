@@ -1,4 +1,11 @@
+/*
+* Carter Brewer, 
+* 7/29/2022
+* asg3.c
+*/
+
 #include "tfs.h"
+
 
 
 /* implementation of assigned functions */
@@ -29,15 +36,15 @@
 
 unsigned int tfs_delete( unsigned int file_descriptor ){
 
-//   unsigned int i;
-// 	file_allocation_table = (unsigned char *)&storage[256];
-// 	for (i = 0; i < N_BYTES; i++){
-// 		storage[i] = 0;
-// 	}
-// 	directory[file_descriptor].status = 0;
-// 	directory[file_descriptor].first_block = 0;
-// 	directory[file_descriptor].byte_offset = 0;
-// 	directory[file_descriptor].size = 0;
+  unsigned int i;
+	file_allocation_table = (unsigned char *)&storage[256];
+	for (i = 0; i < N_BYTES; i++){
+		storage[i] = 0;
+	}
+	directory[file_descriptor].status = 0;
+	directory[file_descriptor].first_block = 0;
+	directory[file_descriptor].byte_offset = 0;
+	directory[file_descriptor].size = 0;
 	return TRUE;
 }
 
