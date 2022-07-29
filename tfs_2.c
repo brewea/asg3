@@ -184,20 +184,23 @@ unsigned int tfs_write( unsigned int file_descriptor, char *buffer, unsigned int
 		return(0);
 	}
 	unsigned int numBlocks = ((int) byte_count / BLOCK_SIZE) + 1;
-	//int bytes_written = 0;
-	char *temp[BLOCK_SIZE];
 	
-
-
 	unsigned int b = tfs_new_block();
 	directory[file_descriptor].first_block = file_allocation_table[b];
 
 	for(int i = 0; i <= numBlocks; i++){
+		if(byte_count < BLOCK_SIZE){
+			strncat(blocks[b].bytes, buffer + directory[file_descriptor].byte_offset,byte_count);
+			file_allocation_table[b] = b + 1;
+			b = tfs_new_block();
+		}
+		else{
+			strncat(blocks[b].bytes, buffer, BLOCK_SIZE);
+			return BLOCK_SIZE;
+		}
 		
-		strncat(blocks[b].bytes, buffer + directory[file_descriptor].byte_offset,BLOCK_SIZE-1);
 		file_allocation_table[b] = *blocks->bytes;
-		file_allocation_table[b] = b + 1;
-		b = tfs_new_block();
+		
 		if(i == numBlocks){
 			file_allocation_table[b] = 1;
 		}
