@@ -167,37 +167,44 @@ return 0;
  */
 
 unsigned int tfs_write( unsigned int file_descriptor, char *buffer, unsigned int byte_count ){
+
+	printf("\nInside tfs_write\n\n");
 	if(!tfs_check_fd_in_range(file_descriptor)) {
+		printf("\ntfs not in range\n\n");
 		return(0);
 	}
 
 	if(!tfs_check_file_is_open(file_descriptor)) {
+		printf("\nfile is not open\n\n");
 		return(0);
 	}
 
 	if(directory[file_descriptor].status == 0) {
+		printf("\nstatus is 0\n\n");
 		return(0);
 	}
 	unsigned int numBlocks = ((int) byte_count / BLOCK_SIZE) + 1;
-	int bytes_written = 0;
+	//int bytes_written = 0;
+	char *temp[BLOCK_SIZE];
+	
+
+
 	unsigned int b = tfs_new_block();
 	directory[file_descriptor].first_block = file_allocation_table[b];
 
 	for(int i = 0; i <= numBlocks; i++){
 		
-		if(byte_count >= BLOCK_SIZE-1){
-			strncat(blocks->bytes,buffer,BLOCK_SIZE-1);
-			printf("\nGreater than");
-		}
-		file_allocation_table[b] = file_allocation_table[b] + 1;
+		strncat(blocks[b].bytes, buffer + directory[file_descriptor].byte_offset,BLOCK_SIZE-1);
+		file_allocation_table[b] = *blocks->bytes;
+		file_allocation_table[b] = b + 1;
 		b = tfs_new_block();
 		if(i == numBlocks){
-			//file_allocation_table[b] = b + 1;
-  			file_allocation_table[b] = LAST_BLOCK;
+			file_allocation_table[b] = 1;
 		}
-		
 	}
-	return bytes_written;
+
+	printf("\n\n\nExiting tfs_write\n\n");
+	return byte_count;
 	
 }
 
